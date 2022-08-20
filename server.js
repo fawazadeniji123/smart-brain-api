@@ -1,6 +1,8 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import cors from 'cors'
+import bcrypt from 'bcrypt-nodejs'
+import { v4 as uuidv4 } from 'uuid'
 
 const app = express()
 app.use(bodyParser.json())
@@ -8,21 +10,55 @@ app.use(cors())
 
 const { log } = console
 
+const generateID = () => uuidv4().split('-')[0]
+
 const database = {
   users: [
     {
-      id: '123',
+      id: generateID(),
       name: 'John',
       email: 'john@gmail.com',
-      password: 'cookies',
+      password: 'john',
       entries: 0,
       joined: new Date(),
     },
     {
-      id: '124',
+      id: generateID(),
       name: 'Sally',
       email: 'sally@gmail.com',
-      password: 'bananas',
+      password: 'sally',
+      entries: 0,
+      joined: new Date(),
+    },
+    {
+      id: generateID(),
+      name: 'Mike',
+      email: 'mike@gmail.com',
+      password: 'mike',
+      entries: 0,
+      joined: new Date(),
+    },
+    {
+      id: generateID(),
+      name: 'Fawaz',
+      email: 'fawaz@gmail.com',
+      password: 'fawaz',
+      entries: 0,
+      joined: new Date(),
+    },
+    {
+      id: generateID(),
+      name: 'Aisha',
+      email: 'aisha@gmail.com',
+      password: 'aisha',
+      entries: 0,
+      joined: new Date(),
+    },
+    {
+      id: generateID(),
+      name: 'Rahinat',
+      email: 'rahinat@gmail.com',
+      password: 'rahinat',
       entries: 0,
       joined: new Date(),
     },
@@ -30,22 +66,19 @@ const database = {
 }
 
 app.get('/', (req, res) => {
-  res.json(database.users)
+  res.json('success')
 })
 
 app.post('/signin', (req, res) => {
   const { email, password } = req.body
   if (!email || !password) {
-    return res.status(400).json('incorrect form submission')
+    return res.status(400).json({ response: 'Incorrect form submission' })
   }
-
-  if (
-    email === database.users[0].email &&
-    password === database.users[0].password
-  ) {
-    res.json(database.users[0])
+  const user = database.users.find((user) => user.email === email)
+  if (user) {
+    res.json({ response: 'success', user })
   } else {
-    res.status(401).json('error logging in')
+    res.status(401).json({ response: 'Invalid email or password' })
   }
 })
 
@@ -56,7 +89,7 @@ app.post('/register', (req, res) => {
   }
 
   database.users.push({
-    id: '125',
+    id: generateID(),
     name: name,
     email: email,
     password: password,
@@ -68,9 +101,9 @@ app.post('/register', (req, res) => {
 
 app.get('/profile/:id', (req, res) => {
   const { id } = req.params
-  const found = database.users.find((user) => user.id === id)
-  if (found) {
-    res.json(found)
+  const user = database.users.find((user) => user.id === id)
+  if (user) {
+    res.json(user)
   } else {
     res.status(404).json('user not found')
   }
@@ -78,10 +111,10 @@ app.get('/profile/:id', (req, res) => {
 
 app.put('/image', (req, res) => {
   const { id } = req.body
-  const found = database.users.find((user) => user.id === id)
-  if (found) {
-    found.entries++
-    res.json(found.entries)
+  const user = database.users.find((user) => user.id === id)
+  if (user) {
+    user.entries++
+    res.json(user.entries)
   } else {
     res.status(404).json('user not found')
   }
