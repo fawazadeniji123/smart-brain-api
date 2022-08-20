@@ -6,10 +6,14 @@ const app = express()
 app.use(bodyParser.json())
 app.use(cors())
 
+const { log } = console
+
 app.get('/', (req, res) => {
-  res.send('Hello World!')
+  log(req.headers)
+  res.send('this is a test')
 })
 
-app.listen(3000, () => {
-  console.log('App listening on port 3000!')
+const PORT = process.env.PORT || 3000
+app.listen(PORT, () => {
+  log(`App running on port ${PORT}!`)
 })

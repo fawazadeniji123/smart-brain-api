@@ -4,5 +4,14 @@
   "trailingComma": "all",
   "printWidth": 80,
   "tabWidth": 2,
-  "useTabs": false
+  "useTabs": false,
+  "overrides": [
+    {
+      "files": "*.json",
+      "options": {
+        "tabWidth": 4
+      }
+    }
+  ]
+  
 }
