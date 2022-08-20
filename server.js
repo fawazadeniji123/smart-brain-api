@@ -57,6 +57,19 @@ app.post('/register', (req, res) => {
   res.json(database.users.at(-1))
 })
 
+app.get('/profile/:id', (req, res) => {
+  const { id } = req.params
+  const found = database.users.find((user) => user.id === id)
+  if (found) {
+    res.json(found)
+  } else {
+    res.status(400).json('not found')
+  }
+})
+
+
+
+
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
   log(`App running on port ${PORT}!`)
