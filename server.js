@@ -96,7 +96,7 @@ app.post('/register', (req, res) => {
     entries: 0,
     joined: new Date(),
   })
-  res.json(database.users.at(-1))
+  res.json({ response: 'success', user: database.users.at(-1) })
 })
 
 app.get('/profile/:id', (req, res) => {
