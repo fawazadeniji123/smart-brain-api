@@ -67,8 +67,16 @@ app.get('/profile/:id', (req, res) => {
   }
 })
 
-
-
+app.put('/image', (req, res) => {
+  const { id } = req.body
+  const found = database.users.find((user) => user.id === id)
+  if (found) {
+    found.entries++
+    res.json(found.entries)
+  } else {
+    res.status(400).json('not found')
+  }
+})
 
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
