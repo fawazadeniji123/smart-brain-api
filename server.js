@@ -34,9 +34,14 @@ app.get('/', (req, res) => {
 })
 
 app.post('/signin', (req, res) => {
+  const { email, password } = req.body
+  if (!email || !password) {
+    return res.status(400).json('incorrect form submission')
+  }
+
   if (
-    req.body.email === database.users[0].email &&
-    req.body.password === database.users[0].password
+    email === database.users[0].email &&
+    password === database.users[0].password
   ) {
     res.json(database.users[0])
   } else {
@@ -45,7 +50,11 @@ app.post('/signin', (req, res) => {
 })
 
 app.post('/register', (req, res) => {
-  const { email, name, password } = req.body
+  const { email, password, name } = req.body
+  if (!email || !name || !password) {
+    return res.status(400).json('incorrect form submission')
+  }
+
   database.users.push({
     id: '125',
     name: name,
@@ -63,7 +72,7 @@ app.get('/profile/:id', (req, res) => {
   if (found) {
     res.json(found)
   } else {
-    res.status(400).json('not found')
+    res.status(404).json('user not found')
   }
 })
 
@@ -74,7 +83,7 @@ app.put('/image', (req, res) => {
     found.entries++
     res.json(found.entries)
   } else {
-    res.status(400).json('not found')
+    res.status(404).json('user not found')
   }
 })
 
