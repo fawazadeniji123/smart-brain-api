@@ -32,9 +32,9 @@ app.get('/', (req, res) => {
   res.json('success')
 })
 
-app.post('/signin', handleSignin(db, bcrypt))
+app.post('/signin', handleSignin(db, bcrypt, generateID))
 
-app.post('/register', handleRegister(db, bcrypt))
+app.post('/register', handleRegister(db, bcrypt, generateID))
 
 app.get('/profile/:id', handleProfile(db))
 
