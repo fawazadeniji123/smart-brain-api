@@ -1,11 +1,19 @@
-const handleImage = (req, res, db) => {
+const handleImage = (db) => async (req, res) => {
   const { id } = req.body
-  db('users')
-    .where('id', '=', id)
-    .increment('entries', 1)
-    .returning('entries')
-    .then((entries) => {
-      res.json(entries[0])
-    })
-    .catch((err) => res.status(400).json('unable to get entries'))
+  try {
+    const [user] = await db('users')
+      .where({ id })
+      .increment('entries', 1)
+      .returning('*')
+
+    if (user) {
+      res.json({ response: 'success', user })
+    } else {
+      res.status(404).json({ response: 'user not found' })
+    }
+  } catch (error) {
+    res.status(404).json({ response: 'error updating entries' })
+  }
 }
+
+export default handleImage
