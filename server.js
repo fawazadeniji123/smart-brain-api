@@ -5,10 +5,10 @@ import bcrypt from 'bcrypt-nodejs'
 import knex from 'knex'
 import { v4 as uuidv4 } from 'uuid'
 
-import handleSignin from './controllers/signin'
-import handleRegister from './controllers/register'
-import handleImage from './controllers/image'
-import handleProfile from './controllers/profile'
+import handleSignin from './controllers/signin.js'
+import handleRegister from './controllers/register.js'
+import handleImage from './controllers/image.js'
+import handleProfile from './controllers/profile.js'
 
 const db = knex({
   client: 'pg',
@@ -32,7 +32,7 @@ app.get('/', (req, res) => {
   res.json('success')
 })
 
-app.post('/signin', handleSignin(db, bcrypt, generateID))
+app.post('/signin', handleSignin(db, bcrypt))
 
 app.post('/register', handleRegister(db, bcrypt, generateID))
 
