@@ -13,10 +13,10 @@ import handleProfile from './controllers/profile.js'
 const db = knex({
   client: 'pg',
   connection: {
-    host: '127.0.0.1',
-    user: 'postgres',
-    password: '6123',
-    database: 'smart-brain',
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+      rejectUnauthorized: false,
+    },
   },
 })
 
