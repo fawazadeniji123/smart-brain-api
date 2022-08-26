@@ -5,7 +5,7 @@ const handleSignin = (db, bcrypt) => async (req, res) => {
   }
 
   try {
-    const [{ _, hash }] = await db('login')
+    const [{ hash }] = await db('login')
       .select('email', 'hash')
       .where({ email })
     if (bcrypt.compareSync(password, hash)) {
