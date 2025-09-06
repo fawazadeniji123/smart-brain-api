@@ -3,7 +3,7 @@ import bodyParser from 'body-parser'
 import cors from 'cors'
 import bcrypt from 'bcrypt-nodejs'
 import knex from 'knex'
-import { v4 as uuidv4 } from 'uuid'
+import 'dotenv/config'
 
 import handleSignin from './controllers/signin.js'
 import handleRegister from './controllers/register.js'
@@ -15,7 +15,7 @@ const db = knex({
   connection: {
     connectionString: process.env.DATABASE_URL,
     ssl: {
-      rejectUnauthorized: true,
+      rejectUnauthorized: false,
     },
   },
 })
@@ -26,15 +26,13 @@ app.use(cors())
 
 const { log } = console
 
-const generateID = () => uuidv4().split('-')[0]
-
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
   res.json('success')
 })
 
 app.post('/signin', handleSignin(db, bcrypt))
 
-app.post('/register', handleRegister(db, bcrypt, generateID))
+app.post('/register', handleRegister(db, bcrypt))
 
 app.get('/profile/:id', handleProfile(db))
 
