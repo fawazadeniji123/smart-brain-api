@@ -11,19 +11,17 @@ const handleRegister = (db, bcrypt) => async (req, res) => {
     return res.status(400).json({ response: 'Invalid email format' })
   }
 
+  const trx = await db.transaction()
   try {
     const hash = bcrypt.hashSync(password)
-    const trxProvider = await db.transactionProvider()
 
     // Insert into login
-    let trx = await trxProvider()
     const login = await trx('login')
       .returning('email')
       .insert({ id: uuidv4(), email, hash })
       .then((rows) => rows[0])
 
     // Insert into users
-    trx = await trxProvider()
     const user = await trx('users')
       .returning('*')
       .insert({
@@ -34,8 +32,11 @@ const handleRegister = (db, bcrypt) => async (req, res) => {
       })
       .then((rows) => rows[0])
 
+    await trx.commit()
+
     return res.json({ response: 'success', user })
   } catch (error) {
+    await trx.rollback()
     console.error('Register error:', error)
     return res.status(500).json({ response: 'Unable to register user' })
   }

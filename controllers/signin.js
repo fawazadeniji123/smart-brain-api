@@ -5,19 +5,22 @@ const handleSignin = (db, bcrypt) => async (req, res) => {
   }
 
   try {
-    const [{ hash }] = await db('login')
-      .select('email', 'hash')
+    const { hash } = await db('login')
+      .select('hash')
       .where({ email })
-    if (bcrypt.compareSync(password, hash)) {
-      try {
-        const [user] = await db('users').returning('*').where({ email })
-        res.json({ response: 'success', user })
-      } catch (error) {
-        res.status(400).json({ response: 'Unable to get user' })
-      }
-    } else {
+      .then((rows) => rows[0])
+
+    if (!bcrypt.compareSync(password, hash)) {
+      console.log('incorrect password')
       res.status(400).json({ response: 'Invalid email or password' })
     }
+
+    const user = await db('users')
+      .returning('*')
+      .where({ email })
+      .then((rows) => rows[0])
+
+    res.json({ response: 'success', user })
   } catch (error) {
     res.status(400).json({ response: 'Invalid email or password' })
   }
