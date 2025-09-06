@@ -38,6 +38,9 @@ const handleRegister = (db, bcrypt) => async (req, res) => {
   } catch (error) {
     await trx.rollback()
     console.error('Register error:', error)
+    if (error.code === '23505')
+      return res.status(400).json({ response: 'Email is already in use.' })
+
     return res.status(500).json({ response: 'Unable to register user' })
   }
 }
