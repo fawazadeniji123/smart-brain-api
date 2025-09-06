@@ -1,33 +1,43 @@
-const handleRegister = (db, bcrypt, generateID) => (req, res) => {
+import { v4 as uuidv4 } from 'uuid'
+
+const handleRegister = (db, bcrypt) => async (req, res) => {
   const { email, password, name } = req.body
-  if (!email || !name || !password) {
+
+  // Basic validation
+  if (!email || !password || !name) {
     return res.status(400).json({ response: 'Incorrect form submission' })
   }
+  if (!email.includes('@') || !email.includes('.')) {
+    return res.status(400).json({ response: 'Invalid email format' })
+  }
 
-  if (!email.includes('@') || !email.includes('.'))
-    return res.status(400).json({ response: 'Incorrect form submission' })
-
-  const hash = bcrypt.hashSync(password)
   try {
-    db.transaction(async (trx) => {
-      try {
-        const id = generateID()
-        const [response] = await trx('login')
-          .insert({ id, email, hash })
-          .returning('email')
-        const [user] = await trx('users').returning('*').insert({
-          id,
-          user_name: name,
-          email: response.email,
-          joined: new Date(),
-        })
-        res.json({ response: 'success', user })
-      } catch (error) {
-        trx.rollback(error)
-      }
-    })
+    const hash = bcrypt.hashSync(password)
+    const trxProvider = await db.transactionProvider()
+
+    // Insert into login
+    let trx = await trxProvider()
+    const login = await trx('login')
+      .returning('email')
+      .insert({ id: uuidv4(), email, hash })
+      .then((rows) => rows[0])
+
+    // Insert into users
+    trx = await trxProvider()
+    const user = await trx('users')
+      .returning('*')
+      .insert({
+        id: uuidv4(),
+        user_name: name,
+        email: login.email,
+        joined: new Date(),
+      })
+      .then((rows) => rows[0])
+
+    return res.json({ response: 'success', user })
   } catch (error) {
-    res.status(400).json({ response: 'Unable to register user' })
+    console.error('Register error:', error)
+    return res.status(500).json({ response: 'Unable to register user' })
   }
 }
 
